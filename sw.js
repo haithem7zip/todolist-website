@@ -57,36 +57,3 @@ self.addEventListener('fetch', event => {
   );
 
 });
-// وظيفة للتحقق من حجم البيانات المخزنة في localStorage
-function checkStorageQuota() {
-    const usedSpace = JSON.stringify(localStorage).length;
-    const quota = 5 * 1024 * 1024; // 5MB
-    if (usedSpace >= quota) {
-        alert("تم امتلاء مساحة التخزين، سيتم مسح المهام القديمة.");
-        clearTasks();
-    }
-}
-
-// وظيفة لمسح البيانات
-function clearTasks() {
-    localStorage.clear();
-    renderTasks();
-}
-
-// وظيفة لعرض المهام
-function renderTasks() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const taskList = document.getElementById('taskList');
-    taskList.innerHTML = '';
-    tasks.forEach(task => {
-        const li = document.createElement('li');
-        li.textContent = task;
-        taskList.appendChild(li);
-    });
-}
-
-// استدعاء وظيفة التحقق عند تحميل الصفحة
-window.onload = function() {
-    checkStorageQuota();
-    renderTasks();
-};
