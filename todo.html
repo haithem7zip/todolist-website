@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✅</text></svg>">
+  <link rel="apple-touch-icon" href="icon.png">
+  <title>قائمة مهامي</title>
+  <style>
+    :root {
+      --primary-color: #000000;
+      --secondary-color: #684300;
+      --danger-color: #750000;
+      --success-color: #007500;
+      --accent-color: #8a2be2;
+      --text-color: #333;
+      --background-color: #f9f9f9;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+    
+    p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+    
+    #taskInput {
+      padding: 10px;
+      width: 250px;
+      border: 2px solid var(--secondary-color);
+      border-radius: 20px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    
+    .buttons-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .addBtn {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      font-size: 17px;
+      border: 2px solid var(--secondary-color);
+      height: 40px;
+      width: 100px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: opacity 0.3s, transform 0.1s;
+    }
+    
+    .clearBtn {
+      background-color: var(--danger-color);
+      color: white;
+      font-weight: bold;
+      font-size: 17px;
+      border: 2px solid darkslategrey;
+      height: 40px;
+      width: 100px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: opacity 0.3s, transform 0.1s;
+    }
+    
+    .clearfinish {
+      background-color: var(--success-color);
+      color: white;
+      font-weight: bold;
+      font-size: 17px;
+      border: 2px solid var(--accent-color);
+      height: 40px;
+      width: 150px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: opacity 0.3s, transform 0.1s;
+    }
+    
+    .addBtn:hover, .clearBtn:hover, .clearfinish:hover {
+      opacity: 0.8;
+    }
+    
+    .addBtn:active, .clearBtn:active, .clearfinish:active {
+      opacity: 0.6;
+      transform: scale(0.98);
+    }
+    
+    #tasks {
+      list-style-type: none;
+      padding: 0;
+      margin: 0 auto;
+      max-width: 500px;
+    }
+    
+    #tasks li {
+      background-color: white;
+      padding: 12px 20px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: right;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    #tasks li:hover {
+      background-color: #f0f0f0;
+    }
+    
+    #tasks li.done {
+      text-decoration: line-through;
+      color: #777;
+      background-color: #e8ffe8;
+    }
+    
+    .pwa-install-btn {
+      background-color: var(--accent-color);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      margin-top: 20px;
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .notification.show {
+      opacity: 1;
+}
+    
+    @media (max-width: 600px) {
+      #taskInput {
+        width: 80%;
+      }
+      
+      .buttons-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>قائمة مهامي</h1>
+  <p>أبسط قائمة مهام على الإطلاق</p>
+  
+  <input id="taskInput" placeholder="أضف مهمة جديدة">
+  
+  <div class="buttons-container">
+    <button class="addBtn" id="addBtn">إضافة</button>
+    <button class="clearfinish" id="clearfinish">حذف المكتملة</button>
+    <button class="clearBtn" id="clearBtn">حذف الكل</button>
+  </div>
+  
+  <ul id="tasks"></ul>
+  
+  <div id="installContainer" class="pwa-install-btn" style="display: none;">
+    تثبيت التطبيق
+  </div>
+  
+  <div class="notification" id="notification">تم حفظ المهمة!</div>
+
+  <script>
+    // إدارة المهام
+    let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    const list = document.getElementById('tasks');
+
+    function render() {
+      list.innerHTML = '';
+      tasks.forEach((t, i) => {
+        const li = document.createElement('li');
+        li.textContent = (i+1) + ". " + t.text;
+        if (t.done) li.classList.add('done');
+        li.onclick = () => toggle(i);
+        list.appendChild(li);
+      });
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      if (!input.value.trim()) return;
+      tasks.push({ text: input.value, done: false });
+      input.value = '';
+      render();
+      showNotification('تم إضافة المهمة!');
+    }
+
+    function toggle(i) {
+      tasks[i].done = !tasks[i].done;
+      render();
+      showNotification(tasks[i].done ? 'تم إكمال المهمة!' : 'تم إعادة فتح المهمة!');
+    }
+
+    function clearTasks() {
+      tasks = [];
+      localStorage.removeItem('tasks');
+      render();
+      showNotification('تم حذف جميع المهام!');
+    }
+
+    function clearFinished() {
+      tasks = tasks.filter(task => !task.done);
+      render();
+      showNotification('تم حذف المهام المكتملة!');
+    }
+
+    document.getElementById('addBtn').onclick = addTask;
+    document.getElementById('clearBtn').onclick = clearTasks;
+    document.getElementById('clearfinish').onclick = clearFinished;
+    
+    document.getElementById('taskInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addTask();
+    });
+
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 2000);
+    }
+
+    // PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // إظهار زر التثبيت
+    let deferredPrompt;
+    const installButton = document.getElementById('installContainer');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installButton.style.display = 'block';
+      
+      installButton.addEventListener('click', () => {
+        installButton.style.display = 'none';
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          } else {
+            console.log('User dismissed the install prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    // تحميل المهام عند البدء
+    render();
+  </script>
+</body>
+</html>
