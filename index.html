@@ -174,8 +174,8 @@
 <body>
   <h1>قائمة مهامي</h1>
   <p>أبسط قائمة مهام على الإطلاق</p>
-  
-  <input id="taskInput" placeholder="أضف مهمة جديدة">
+
+ㅤ<input id="taskInput" placeholder="أضف مهمة جديدة">
   
   <div class="buttons-container">
     <button class="addBtn" id="addBtn">إضافة</button>
@@ -224,29 +224,11 @@
     }
 
     function clearTasks() {
-  // جلب بيانات المهام من التخزين المحلي
-  const tasksData = localStorage.getItem('tasks');
-
-  // التأكد من وجود مهام أولاً
-  if (!tasksData || tasksData === '[]') {
-    showNotification('لا توجد مهام لحذفها!');
-    return; // الخروج من الدالة إذا لم تكن هناك مهام
-  }
-
-  // حساب حجم البيانات بالميغابايت (MB)
-  const sizeInMB = new Blob([tasksData]).size / (1024 * 1024);
-
-  // التحقق إذا كان الحجم أكبر من أو يساوي 5 ميغابايت
-  if (sizeInMB >= 5) {
-    tasks = [];
-    localStorage.removeItem('tasks');
-    render();
-    showNotification('تم الحذف! حجم التخزين تجاوز 5 ميغابايت.');
-  } else {
-    // إذا كان الحجم أقل، يتم عرض رسالة للمستخدم
-    showNotification(لم يتم الحذف. الحجم الحالي ${sizeInMB.toFixed(2)} ميغابايت.);
-  }
-}
+      tasks = [];
+      localStorage.removeItem('tasks');
+      render();
+      showNotification('تم حذف جميع المهام!');
+    }
 
     function clearFinished() {
       tasks = tasks.filter(task => !task.done);
