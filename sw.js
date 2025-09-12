@@ -7,7 +7,7 @@ const urlsToCache = [
   './icon-512.png'
 ];
 
-// التثبيت الأولي وتهيئة الكاش
+// installation and cache
 self.addEventListener('install', event => {
   console.log('Service Worker: Installed');
   event.waitUntil(
@@ -20,7 +20,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// تفعيل Service Worker
+// Service Worker
 self.addEventListener('activate', event => {
   console.log('Service Worker: Activated');
   event.waitUntil(
@@ -37,18 +37,18 @@ self.addEventListener('activate', event => {
   );
 });
 
-// إدارة الطلبات
+// request management
 self.addEventListener('fetch', event => {
   console.log('Service Worker: Fetching');
   event.respondWith(
     fetch(event.request)
       .then(res => {
-        // نسخ الاستجابة
+        // copy answer
         const resClone = res.clone();
-        // فتح الكاش
+        // open cache
         caches.open(CACHE_NAME)
           .then(cache => {
-            // إضافة الاستجابة إلى الكاش
+            // respond cache
             cache.put(event.request, resClone);
           });
         return res;
