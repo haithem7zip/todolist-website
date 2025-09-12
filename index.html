@@ -195,7 +195,7 @@
   <div class="notification" id="notification">تم حفظ المهمة!</div>
 
   <script>
-    // إدارة المهام
+    // tasks management 
     let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
     const list = document.getElementById('tasks');
 
@@ -270,7 +270,7 @@
       });
     }
 
-    // إظهار زر التثبيت
+    // install button
     let deferredPrompt;
     const installButton = document.getElementById('installContainer');
     
@@ -293,7 +293,7 @@
       });
     });
 
-    // تحميل المهام عند البدء
+    // tasks loading 
     render();
   </script>
 </body>
